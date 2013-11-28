@@ -11,8 +11,10 @@ options = { 'new':'creates a new contact',
            'edit': 'edits an existing contact' }
 
 class InvalidOptionError(Exception):
-    def __init__(self):
-        self.strerr = "Sorry, invalid option. Please try again."
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return self.message
 
 def get_user_option():
     try:
@@ -21,9 +23,9 @@ def get_user_option():
             if arg[0] == '-' and arg[1:] in options.keys():
                 return arg[1:]
             else:
-                raise InvalidOptionError()
+                raise InvalidOptionError("Sorry, wrong option. Please try again.")
         except InvalidOptionError as e:
-            print e.strerr
+            print e
     except IndexError:
         print "Error: no option entered"
 
