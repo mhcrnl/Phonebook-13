@@ -3,6 +3,10 @@ Phonebook
 
 Simple phonebook to store, retrieve, edit and delete contacts.
 
+Installation
+------------
+After cloning, cd to the cloned directory, and give execution priveleges to the install.sh file. Install the app by running the install.sh file.
+
 Usage
 -----
 To create a new contact: SimplePhonebook -new 
