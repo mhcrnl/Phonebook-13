@@ -17,6 +17,7 @@ class InvalidOptionError(Exception):
         return self.message
 
 def get_user_option():
+    """Get the option from the user."""
     try:
         arg = sys.argv[1]
         try:
@@ -29,7 +30,8 @@ def get_user_option():
     except IndexError:
         print "Error: no option entered"
 
-def store_new_contact():
+def new():
+    """Create a new contact."""
     name = raw_input("Enter name of contact: ")
     for contact in phonebook:
         if contact == name:
@@ -40,7 +42,8 @@ def store_new_contact():
     phonebook[name] = num
     print "Contact successfully created."
 
-def search_contact():
+def search():
+    """Search for an existing contact."""
     name = raw_input("Enter name of contact to get contact number: ")
     for contact in phonebook:
         if contact == name:
@@ -48,7 +51,8 @@ def search_contact():
             return
     print "Contact not found."
 
-def delete_contact():
+def delete():
+    """Delete a contact."""
     name = raw_input("Enter name of contact to delete: ")
     for contact in phonebook:
         if contact == name:
@@ -57,7 +61,8 @@ def delete_contact():
             return
     print "Contact not found."
     
-def edit_contact():
+def edit():
+    """Edit an existing contact"""
     name = raw_input("Enter name of contact to edit: ")
     for contact in phonebook:
         if contact == name:
@@ -69,9 +74,9 @@ def edit_contact():
 
 def main():
     option = get_user_option()
-    if option == "new": store_new_contact()
-    elif option == "search": search_contact()
-    elif option == "delete": delete_contact()
-    elif option == "edit": edit_contact()
+    if option == "new": new()
+    elif option == "search": search()
+    elif option == "delete": delete()
+    elif option == "edit": edit()
 
 if __name__ == "__main__": main()
