@@ -9,13 +9,10 @@ After cloning, cd to the cloned directory, and give execution privileges to the 
 
 Usage
 -----
-- To create a new contact: Phonebook -new 
-
+- To create a new contact: Phonebook -new
 - To search for an existing contact: Phonebook -search
-
 - To edit an existing contact: Phonebook -edit
-
 - To delete an existing contact: Phonebook -delete
 
-You can also use the Phonebook GUI. To use GUI, just type Phonebook.
+You can also use the Phonebook GUI. To use the GUI, just type Phonebook.
 
