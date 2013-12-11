@@ -5,8 +5,6 @@ import sys
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
-phonebook = shelve.open("phonebook.shelve")
-
 options = { 'new':'creates a new contact',
            'search': 'searches for an existing contact',
            'delete': 'deletes a contact',
@@ -18,6 +16,7 @@ class PhonebookGUI(QtGui.QWidget):
         self.initUI()
     
     def initUI(self):
+        
         self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint)
         self.label = QtGui.QLabel("Choose action:", self)
         self.options = QtGui.QComboBox(self)
@@ -30,7 +29,8 @@ class PhonebookGUI(QtGui.QWidget):
         self.label.move(50, 10)
         
         self.options.activated[str].connect(self.onActivated)
-        self.setGeometry(300, 300, 300, 175)
+        self.move(300, 300)
+        self.setFixedSize(300, 175)
         self.setWindowTitle('Phonebook')
         self.show()
         
@@ -51,29 +51,40 @@ class PhonebookGUI(QtGui.QWidget):
             if new_contact == '':
                 self.showEmptyErrorDialog()
                 return
+            phonebook = shelve.open('phonebook.shelve')
             for contact in phonebook:
                 if contact == new_contact:
                     QtGui.QMessageBox.information(self, 'Error', 'Contact already exists. To edit, try the edit option')
+                    phonebook.close()
                     return
             text, ok = QtGui.QInputDialog.getText(self, 'New number', 'Enter new number:')
             if ok:
                 new_number = str(text).strip()
                 if new_number == '':
                     self.showEmptyErrorDialog()
+                    phonebook.close()
                     return
                 phonebook[new_contact] = new_number
                 QtGui.QMessageBox.information(self, 'Result', 'Contact successfully added')
+                phonebook.close()
                 return
         
     def showSearchDialog(self):
+        phonebook = shelve.open('phonebook.shelve')
         text, ok = QtGui.QInputDialog.getText(self, 'Search contact', 'Enter name of contact')
         if ok:
             search_contact = str(text).strip()
+            if search_contact == '':
+                self.showEmptyErrorDialog()
+                return
+            phonebook = shelve.open('phonebook.shelve')
             for contact in phonebook:
                 if contact == search_contact:
                     QtGui.QMessageBox.information(self, 'Number', phonebook[contact])
+                    phonebook.close()
                     return
             QtGui.QMessageBox.information(self, 'Error', 'Contact not found')
+            phonebook.close()
             return
 
     def showDeleteDialog(self):
@@ -83,22 +94,26 @@ class PhonebookGUI(QtGui.QWidget):
             if delete_contact == '':
                 self.showEmptyErrorDialog()
                 return
+            phonebook = shelve.open('phonebook.shelve')
             for contact in phonebook:
                 if contact == delete_contact:
                     del phonebook[delete_contact]
                     QtGui.QMessageBox.information(self, 'Result', 'Contact successfully deleted')
+                    phonebook.close()
                     return
             QtGui.QMessageBox.information(self, 'Error', 'Contact not found')
+            phonebook.close()
             return
 
     def showEditDialog(self):
-        text, ok = QtGui.QInputDialog.getText(self,
-                    'Edit contact', 'Enter name of contact')
+        phonebook = shelve.open('phonebook.shelve')
+        text, ok = QtGui.QInputDialog.getText(self, 'Edit contact', 'Enter name of contact')
         if ok:
             edit_contact = str(text).strip()
             if edit_contact == '':
                 self.showEmptyErrorDialog()
                 return
+            phonebook = shelve.open('phonebook.shelve')
             for contact in phonebook:
                 if contact == edit_contact:
                     old_number = phonebook[contact]
@@ -107,11 +122,15 @@ class PhonebookGUI(QtGui.QWidget):
                         new_number = str(text).strip()
                         if new_number == '':
                             self.showEmptyErrorDialog()
+                            phonebook.close()
                             return
                         phonebook[edit_contact] = new_number
                         QtGui.QMessageBox.information(self, 'Result', 'Contact successfully edited')
+                        phonebook.close()
                     return
             QtGui.QMessageBox.information(self, 'Error', 'Contact not found')
+            phonebook.close()
+            return
             
     def showEmptyErrorDialog(self):
         QtGui.QMessageBox.information(self, 'Error', 'The field cannot be empty')
@@ -138,45 +157,57 @@ def get_user_option():
 
 def new():
     """Create a new contact."""
+    phonebook = shelve.open('phonebook.shelve')
     name = raw_input("Enter name of contact: ")
     for contact in phonebook:
         if contact == name:
             print "Contact already exists."
             print "To edit this contact, try the 'edit' option"
+            phonebook.close()
             return
     num = raw_input("Enter contact number: ")
     phonebook[name] = num
     print "Contact successfully created."
+    phonebook.close()
 
 def search():
     """Search for an existing contact."""
+    phonebook = shelve.open('phonebook.shelve')
     name = raw_input("Enter name of contact to get contact number: ")
     for contact in phonebook:
         if contact == name:
             print phonebook[contact]
+            phonebook.close()
             return
     print "Contact not found."
+    phonebook.close()
 
 def delete():
     """Delete a contact."""
+    phonebook = shelve.open('phonebook.shelve')
     name = raw_input("Enter name of contact to delete: ")
     for contact in phonebook:
         if contact == name:
             del phonebook[name]
             print "Contact successfully deleted."
+            phonebook.close()
             return
     print "Contact not found."
-    
+    phonebook.close()
+
 def edit():
     """Edit an existing contact"""
+    phonebook = shelve.open('phonebook.shelve')
     name = raw_input("Enter name of contact to edit: ")
     for contact in phonebook:
         if contact == name:
             new_num = raw_input("Enter new number: ")
             phonebook[name] = new_num
             print "Contact successfully edited."
+            phonebook.close()
             return
     print "Contact not found."
+    phonebook.close()
 
 def main():
     option = get_user_option()
