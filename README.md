@@ -1,7 +1,7 @@
 Phonebook
 =========
 
-A simple phonebook to store, retrieve, edit and delete contacts.
+A simple phonebook (command line as well as GUI) to store, retrieve, edit and delete contacts.
 
 Installation
 ------------
@@ -9,11 +9,13 @@ After cloning, cd to the cloned directory, and give execution privileges to the 
 
 Usage
 -----
-To create a new contact: Phonebook -new 
+- To create a new contact: Phonebook -new 
 
-To search for an existing contact: Phonebook -search
+- To search for an existing contact: Phonebook -search
 
-To edit an existing contact: Phonebook -edit
+- To edit an existing contact: Phonebook -edit
 
-To delete an existing contact: Phonebook -delete
+- To delete an existing contact: Phonebook -delete
+
+You can also use the Phonebook GUI. To use GUI, just type Phonebook.
 

@@ -2,6 +2,8 @@
 
 import shelve
 import sys
+from PyQt4 import QtGui
+from PyQt4 import QtCore
 
 phonebook = shelve.open("phonebook.shelve")
 
@@ -10,6 +12,110 @@ options = { 'new':'creates a new contact',
            'delete': 'deletes a contact',
            'edit': 'edits an existing contact' }
 
+class PhonebookGUI(QtGui.QWidget):
+    def __init__(self):
+        super(PhonebookGUI, self).__init__()
+        self.initUI()
+    
+    def initUI(self):
+        self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint)
+        self.label = QtGui.QLabel("Choose action:", self)
+        self.options = QtGui.QComboBox(self)
+        self.options.addItem('Select')
+        self.options.addItem('Add new contact')
+        self.options.addItem('Edit existing contact')
+        self.options.addItem('Delete contact')
+        self.options.addItem('Search contact')
+        self.options.move(50, 50)
+        self.label.move(50, 10)
+        
+        self.options.activated[str].connect(self.onActivated)
+        self.setGeometry(300, 300, 300, 175)
+        self.setWindowTitle('Phonebook')
+        self.show()
+        
+    def onActivated(self, text):
+        if text == 'Add new contact':
+            self.showNewDialog()
+        elif text == 'Edit existing contact':
+            self.showEditDialog()
+        elif text == 'Delete contact':
+            self.showDeleteDialog()
+        elif text == 'Search contact':
+            self.showSearchDialog()
+
+    def showNewDialog(self):
+        text, ok = QtGui.QInputDialog.getText(self, 'New contact', 'Enter new name:')
+        if ok:
+            new_contact = str(text).strip()
+            if new_contact == '':
+                self.showEmptyErrorDialog()
+                return
+            for contact in phonebook:
+                if contact == new_contact:
+                    QtGui.QMessageBox.information(self, 'Error', 'Contact already exists. To edit, try the edit option')
+                    return
+            text, ok = QtGui.QInputDialog.getText(self, 'New number', 'Enter new number:')
+            if ok:
+                new_number = str(text).strip()
+                if new_number == '':
+                    self.showEmptyErrorDialog()
+                    return
+                phonebook[new_contact] = new_number
+                QtGui.QMessageBox.information(self, 'Result', 'Contact successfully added')
+                return
+        
+    def showSearchDialog(self):
+        text, ok = QtGui.QInputDialog.getText(self, 'Search contact', 'Enter name of contact')
+        if ok:
+            search_contact = str(text).strip()
+            for contact in phonebook:
+                if contact == search_contact:
+                    QtGui.QMessageBox.information(self, 'Number', phonebook[contact])
+                    return
+            QtGui.QMessageBox.information(self, 'Error', 'Contact not found')
+            return
+
+    def showDeleteDialog(self):
+        text, ok = QtGui.QInputDialog.getText(self, 'Delete contact', 'Enter name of contact')
+        if ok:
+            delete_contact = str(text).strip()
+            if delete_contact == '':
+                self.showEmptyErrorDialog()
+                return
+            for contact in phonebook:
+                if contact == delete_contact:
+                    del phonebook[delete_contact]
+                    QtGui.QMessageBox.information(self, 'Result', 'Contact successfully deleted')
+                    return
+            QtGui.QMessageBox.information(self, 'Error', 'Contact not found')
+            return
+
+    def showEditDialog(self):
+        text, ok = QtGui.QInputDialog.getText(self,
+                    'Edit contact', 'Enter name of contact')
+        if ok:
+            edit_contact = str(text).strip()
+            if edit_contact == '':
+                self.showEmptyErrorDialog()
+                return
+            for contact in phonebook:
+                if contact == edit_contact:
+                    old_number = phonebook[contact]
+                    text, ok = QtGui.QInputDialog.getText(self, 'New number', 'Enter new number:', text=old_number)
+                    if ok:
+                        new_number = str(text).strip()
+                        if new_number == '':
+                            self.showEmptyErrorDialog()
+                            return
+                        phonebook[edit_contact] = new_number
+                        QtGui.QMessageBox.information(self, 'Result', 'Contact successfully edited')
+                    return
+            QtGui.QMessageBox.information(self, 'Error', 'Contact not found')
+            
+    def showEmptyErrorDialog(self):
+        QtGui.QMessageBox.information(self, 'Error', 'The field cannot be empty')
+            
 class InvalidOptionError(Exception):
     def __init__(self, message):
         self.message = message
@@ -28,7 +134,7 @@ def get_user_option():
         except InvalidOptionError as e:
             print e
     except IndexError:
-        print "Error: no option entered"
+        return 'gui'
 
 def new():
     """Create a new contact."""
@@ -74,7 +180,11 @@ def edit():
 
 def main():
     option = get_user_option()
-    if option == "new": new()
+    if option == "gui":
+        app = QtGui.QApplication(sys.argv)
+        gui = PhonebookGUI()
+        sys.exit(app.exec_())
+    elif option == "new": new()
     elif option == "search": search()
     elif option == "delete": delete()
     elif option == "edit": edit()
