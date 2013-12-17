@@ -16,3 +16,5 @@ Usage
 
 You can also use the Phonebook GUI. To use the GUI, just type Phonebook.
 
+Note: Installing this app will install PyQt4 if not installed already.
+
